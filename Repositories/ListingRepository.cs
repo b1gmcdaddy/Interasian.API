@@ -15,12 +15,20 @@ namespace Interasian.API.Repositories
 			_context = context;
 		}
 
-		public async Task<PagedList<Listing>> GetAllListingsAsync(PaginationRequest paginationRequest)
+		public async Task<PagedList<Listing>> GetAllListingsAsync(PaginationRequest paginationRequest, string? searchQuery = null)
 		{
-			return await PagedList<Listing>.ToPagedListAsync(
-				_context.Listings.OrderBy(l => l.ListingId), 
-				paginationRequest.PageNumber, 
-				paginationRequest.PageSize);
+			var query = _context.Listings.AsQueryable();
+
+			if (!string.IsNullOrEmpty(searchQuery)) 
+			{
+				query = query.Where(l => l.Title.Contains(searchQuery) || l.Location.Contains(searchQuery));
+			}
+
+			query = query.OrderBy(l => l.ListingId);
+
+			return await PagedList<Listing>.ToPagedListAsync(query, 
+																paginationRequest.PageNumber, 
+																paginationRequest.PageSize);	
 		}
 
 		public async Task<Listing?> GetListingByIdAsync(int listingId)
@@ -52,5 +60,3 @@ namespace Interasian.API.Repositories
 			await _context.Listings.AnyAsync(l => l.ListingId == id);
 	}
 }
-
-

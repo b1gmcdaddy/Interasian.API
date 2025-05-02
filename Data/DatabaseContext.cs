@@ -12,13 +12,19 @@ namespace Interasian.API.Data
 		}
 
 		public DbSet<Listing> Listings { get; set; }
-
+		public DbSet<ListingImage> ListingImages { get; set; }
 
 
 		// SEEDING DATA
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
+
+			modelBuilder.Entity<ListingImage>()
+				.HasOne(i => i.Listing)
+				.WithMany(l => l.Images)
+				.HasForeignKey(i => i.ListingId)
+				.OnDelete(DeleteBehavior.Cascade);
 
 			modelBuilder.Entity<Listing>().HasData(
 				new Listing

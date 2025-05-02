@@ -149,3 +149,5 @@ C:\Users\Jolo\source\repos\Interasian.API\obj\Debug\net8.0\refint\Interasian.API
 C:\Users\Jolo\source\repos\Interasian.API\obj\Debug\net8.0\Interasian.API.pdb
 C:\Users\Jolo\source\repos\Interasian.API\obj\Debug\net8.0\Interasian.API.genruntimeconfig.cache
 C:\Users\Jolo\source\repos\Interasian.API\obj\Debug\net8.0\ref\Interasian.API.dll
+C:\Users\Jolo\source\repos\Interasian.API\obj\Debug\net8.0\Interasian.API.sourcelink.json
+C:\Users\Jolo\source\repos\Interasian.API\bin\Debug\net8.0\Interasian.API.staticwebassets.runtime.json

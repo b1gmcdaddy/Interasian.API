@@ -10,6 +10,7 @@ namespace Interasian.API.MappingProfiles
 		{
 			CreateMap<Listing, ListingDTO>().ReverseMap();
 			CreateMap<Listing, CreateListingDTO>().ReverseMap();
+			CreateMap<ListingImage, ListingImageDTO>().ReverseMap();
 		}
 	}
 }

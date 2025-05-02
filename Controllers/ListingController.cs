@@ -18,20 +18,22 @@ namespace Interasian.API.Controllers
 		private readonly IListingRepository _repo;
 		private readonly IMapper _mapper;
 		readonly ILogger<ListingController> _logger;
+		private readonly IWebHostEnvironment _environment;
 
-		public ListingController(IListingRepository repo, IMapper mapper, ILogger<ListingController> logger)
+		public ListingController(IListingRepository repo, IMapper mapper, ILogger<ListingController> logger, IWebHostEnvironment environment)
 		{
 			_repo = repo;
 			_mapper = mapper;
 			_logger = logger;
+			_environment = environment;
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<ApiResponse>> GetAllListings([FromQuery] PaginationRequest paginationRequest)
+		public async Task<ActionResult<ApiResponse>> GetAllListings([FromQuery] PaginationRequest paginationRequest, [FromQuery] string? searchQuery = null)
 		{
 			try
 			{
-				var listings = await _repo.GetAllListingsAsync(paginationRequest);
+				var listings = await _repo.GetAllListingsAsync(paginationRequest, searchQuery);
 				var listingDtos = _mapper.Map<List<ListingDTO>>(listings);
 				return Ok(new ApiResponse(true, "Listings retrieved successfully", listingDtos));
 			}
@@ -80,6 +82,7 @@ namespace Interasian.API.Controllers
 				return StatusCode(500, "internal server err");
 			}
 		}
+
 
 		[HttpPut("{listingId}")]
 		public async Task<IActionResult> UpdateListing(int listingId, CreateListingDTO dto)

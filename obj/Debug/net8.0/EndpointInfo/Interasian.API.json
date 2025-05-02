@@ -12,7 +12,7 @@
         ],
         "parameters": [
           {
-            "name": "pageIndex",
+            "name": "PageNumber",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -20,7 +20,7 @@
             }
           },
           {
-            "name": "pageSize",
+            "name": "PageSize",
             "in": "query",
             "schema": {
               "type": "integer",

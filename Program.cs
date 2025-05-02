@@ -18,6 +18,7 @@ builder.Services.AddAutoMapper(typeof(Mapper));
 
 // Repositories
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
+builder.Services.AddScoped<IListingImageRepository, ListingImageRepository>();
 
 // Use the Serilog.AspNetCore NuGet Package
 Log.Logger = new LoggerConfiguration()

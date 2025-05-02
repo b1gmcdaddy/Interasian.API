@@ -6,11 +6,12 @@ namespace Interasian.API.Repositories
 {
 	public interface IListingRepository
 	{
-		Task<PagedList<Listing>> GetAllListingsAsync(PaginationRequest paginationRequest);
+		Task<PagedList<Listing>> GetAllListingsAsync(PaginationRequest paginationRequest, string? searchQuery = null);
 		Task<Listing?> GetListingByIdAsync(int listingId);
 		Task<Listing> CreateListingAsync(Listing listing);
 		Task UpdateListingAsync(Listing listing);
 		Task DeleteListingAsync(Listing listing);
 		Task<bool> ListingExistsAsync(int listingId);
+
 	}
 }
