@@ -29,18 +29,22 @@ namespace Interasian.API.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<ApiResponse>> GetAllListings([FromQuery] PaginationRequest paginationRequest, [FromQuery] string? searchQuery = null)
+		public async Task<ActionResult<ApiResponse>> GetAllListings(
+			[FromQuery] PaginationRequest paginationRequest, 
+			[FromQuery] string? searchQuery = null,
+			[FromQuery] SortOptions sortOption = SortOptions.Default
+			)
 		{
 			try
 			{
-				var listings = await _repo.GetAllListingsAsync(paginationRequest, searchQuery);
+				var listings = await _repo.GetAllListingsAsync(paginationRequest, searchQuery, sortOption);
 				var listingDtos = _mapper.Map<List<ListingDTO>>(listings);
 				return Ok(new ApiResponse(true, "Listings retrieved successfully", listingDtos));
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "Error fetching listings");
-				return StatusCode(500, new ApiResponse(false, "Internal server error", null));
+				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
 			}
 		}
 

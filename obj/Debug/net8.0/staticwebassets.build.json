@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "bNcuBZJWJhZUP4DpfBP3++m3JSt18cvQMx25lECzKNk=",
+  "Hash": "T9Ud8dgYce3mUoHNuZSjJr//6YAsu5YBqvo6R3Teac8=",
   "Source": "Interasian.API",
   "BasePath": "_content/Interasian.API",
   "Mode": "Default",
@@ -16,6 +16,27 @@
     }
   ],
   "Assets": [
+    {
+      "Identity": "C:\\Users\\Jolo\\source\\repos\\Interasian.API\\wwwroot\\Uploads\\1\\a8cddb57-c211-4595-bc58-d458a83066a2.jpg",
+      "SourceId": "Interasian.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Jolo\\source\\repos\\Interasian.API\\wwwroot\\",
+      "BasePath": "_content/Interasian.API",
+      "RelativePath": "Uploads/1/a8cddb57-c211-4595-bc58-d458a83066a2#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "83ggo0txej",
+      "Integrity": "dN1HqSMG8GpSK0FhI1ty+1cHX7HnamqcMMDlunG3R08=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Uploads\\1\\a8cddb57-c211-4595-bc58-d458a83066a2.jpg"
+    },
     {
       "Identity": "C:\\Users\\Jolo\\source\\repos\\Interasian.API\\wwwroot\\Uploads\\2\\056bacac-0ce6-433e-ada2-1abab0553c3f.png",
       "SourceId": "Interasian.API",
@@ -60,6 +81,88 @@
     }
   ],
   "Endpoints": [
+    {
+      "Route": "Uploads/1/a8cddb57-c211-4595-bc58-d458a83066a2.83ggo0txej.jpg",
+      "AssetFile": "C:\\Users\\Jolo\\source\\repos\\Interasian.API\\wwwroot\\Uploads\\1\\a8cddb57-c211-4595-bc58-d458a83066a2.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "361649"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"dN1HqSMG8GpSK0FhI1ty+1cHX7HnamqcMMDlunG3R08=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 02 May 2025 12:04:50 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "83ggo0txej"
+        },
+        {
+          "Name": "label",
+          "Value": "Uploads/1/a8cddb57-c211-4595-bc58-d458a83066a2.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-dN1HqSMG8GpSK0FhI1ty+1cHX7HnamqcMMDlunG3R08="
+        }
+      ]
+    },
+    {
+      "Route": "Uploads/1/a8cddb57-c211-4595-bc58-d458a83066a2.jpg",
+      "AssetFile": "C:\\Users\\Jolo\\source\\repos\\Interasian.API\\wwwroot\\Uploads\\1\\a8cddb57-c211-4595-bc58-d458a83066a2.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "361649"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"dN1HqSMG8GpSK0FhI1ty+1cHX7HnamqcMMDlunG3R08=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 02 May 2025 12:04:50 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-dN1HqSMG8GpSK0FhI1ty+1cHX7HnamqcMMDlunG3R08="
+        }
+      ]
+    },
     {
       "Route": "Uploads/2/056bacac-0ce6-433e-ada2-1abab0553c3f.4tfnwv9tge.png",
       "AssetFile": "C:\\Users\\Jolo\\source\\repos\\Interasian.API\\wwwroot\\Uploads\\2\\056bacac-0ce6-433e-ada2-1abab0553c3f.png",

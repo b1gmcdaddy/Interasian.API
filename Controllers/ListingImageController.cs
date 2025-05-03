@@ -37,7 +37,7 @@ namespace Interasian.API.Controllers
 				var listing = await _listingRepo.GetListingByIdAsync(listingId);
 				if (listing == null)
 				{
-					return NotFound(new ApiResponse(false, $"Listing with ID {listingId} not found", null));
+					return NotFound(new ApiResponse(false, $"Listing with ID {listingId} not found", null!));
 				}
 				
 				string filepath = GetFilePath(listingId);
@@ -68,7 +68,7 @@ namespace Interasian.API.Controllers
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "Error uploading image");
-				return StatusCode(500, new ApiResponse(false, "Internal server error", null));
+				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
 			}
 		}
 
@@ -80,7 +80,7 @@ namespace Interasian.API.Controllers
 				var listing = await _listingRepo.GetListingByIdAsync(listingId);
 				if (listing == null)
 				{
-					return NotFound(new ApiResponse(false, $"Listing with ID {listingId} not found", null));
+					return NotFound(new ApiResponse(false, $"Listing with ID {listingId} not found", null!));
 				}
 				
 				var images = await _repo.GetListingImagesAsync(listingId);
@@ -96,7 +96,7 @@ namespace Interasian.API.Controllers
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, $"Error retrieving images for listing {listingId}");
-				return StatusCode(500, new ApiResponse(false, "Internal server error", null));
+				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
 			}
 		}
 

@@ -32,7 +32,8 @@ namespace Interasian.API.Repositories
         
         public async Task<ListingImage> GetListingImageByIdAsync(int imageId)
         {
-            return await _context.ListingImages.FindAsync(imageId);
+            var image = await _context.ListingImages.FindAsync(imageId);
+            return image ?? throw new KeyNotFoundException($"Image with ID {imageId} was not found");
         }
         
         public async Task DeleteListingImageAsync(ListingImage image)

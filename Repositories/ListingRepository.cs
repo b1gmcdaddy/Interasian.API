@@ -15,7 +15,11 @@ namespace Interasian.API.Repositories
 			_context = context;
 		}
 
-		public async Task<PagedList<Listing>> GetAllListingsAsync(PaginationRequest paginationRequest, string? searchQuery = null)
+		public async Task<PagedList<Listing>> GetAllListingsAsync(
+			PaginationRequest paginationRequest, 
+			string? searchQuery = null,
+			SortOptions sortOption = SortOptions.Default
+			)
 		{
 			var query = _context.Listings.AsQueryable();
 
@@ -24,11 +28,12 @@ namespace Interasian.API.Repositories
 				query = query.Where(l => l.Title.Contains(searchQuery) || l.Location.Contains(searchQuery));
 			}
 
-			query = query.OrderBy(l => l.ListingId);
+			query = ApplySorting(query, sortOption);
 
-			return await PagedList<Listing>.ToPagedListAsync(query, 
-																paginationRequest.PageNumber, 
-																paginationRequest.PageSize);	
+			return await PagedList<Listing>.ToPagedListAsync(
+				query, 
+				paginationRequest.PageNumber, 
+				paginationRequest.PageSize);	
 		}
 
 		public async Task<Listing?> GetListingByIdAsync(int listingId)
@@ -58,5 +63,19 @@ namespace Interasian.API.Repositories
 
 		public async Task<bool> ListingExistsAsync(int id) =>
 			await _context.Listings.AnyAsync(l => l.ListingId == id);
+
+		private IQueryable<Listing> ApplySorting(IQueryable<Listing> query, SortOptions sortOption)
+        {
+            return sortOption switch
+            {
+                SortOptions.PriceAsc => query.OrderBy(l => l.Price),
+                SortOptions.PriceDesc => query.OrderByDescending(l => l.Price),
+                SortOptions.BedroomsAsc => query.OrderBy(l => l.BedRooms),
+                SortOptions.BedroomsDesc => query.OrderByDescending(l => l.BedRooms),
+                SortOptions.BathroomsAsc => query.OrderBy(l => l.BathRooms),
+                SortOptions.BathroomsDesc => query.OrderByDescending(l => l.BathRooms),
+                _ => query.OrderBy(l => l.ListingId) 
+            };
+        }
 	}
 }
