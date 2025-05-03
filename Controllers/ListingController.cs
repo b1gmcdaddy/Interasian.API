@@ -29,12 +29,14 @@ namespace Interasian.API.Controllers
 		public async Task<ActionResult<ApiResponse>> GetAllListings(
 			[FromQuery] PaginationRequest paginationRequest, 
 			[FromQuery] string? searchQuery = null,
+			[FromQuery] string? propertyType = null,
 			[FromQuery] SortOptions sortOption = SortOptions.Default
 			)
 		{
 			try
 			{
-				var listings = await _repo.GetAllListingsAsync(paginationRequest, searchQuery, sortOption);
+				var listings = await _repo.GetAllListingsAsync(paginationRequest, 
+				searchQuery, propertyType, sortOption);
 				var listingDtos = _mapper.Map<List<ListingDTO>>(listings);
 				return Ok(new ApiResponse(true, "Listings retrieved successfully", listingDtos));
 			}

@@ -4,6 +4,7 @@ using Interasian.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Interasian.API.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20250503114117_AddMoreSeedData")]
+    partial class AddMoreSeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,7 +109,6 @@ namespace Interasian.API.Migrations
                         {
                             ListingId = 3,
                             BathRooms = 8,
-                            BedRooms = 8,
                             Description = "Prime commercial building with 5 floors suitable for office spaces.",
                             FloorArea = "3500 sqm",
                             LandArea = "1200 sqm",
@@ -120,8 +122,6 @@ namespace Interasian.API.Migrations
                         new
                         {
                             ListingId = 4,
-                            BathRooms = 5,
-                            BedRooms = 5,
                             Description = "Beautiful vacant lot with panoramic view of Taal Lake.",
                             LandArea = "800 sqm",
                             Location = "Lapu-Lapu City",

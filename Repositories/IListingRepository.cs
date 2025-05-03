@@ -9,6 +9,7 @@ namespace Interasian.API.Repositories
 		Task<PagedList<Listing>> GetAllListingsAsync(
 			PaginationRequest paginationRequest, 
 			string? searchQuery = null,
+			string? propertyType = null,
 			SortOptions sortOption = SortOptions.Default
 			);
 		Task<Listing?> GetListingByIdAsync(int listingId);

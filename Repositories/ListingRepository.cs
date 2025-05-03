@@ -18,6 +18,7 @@ namespace Interasian.API.Repositories
 		public async Task<PagedList<Listing>> GetAllListingsAsync(
 			PaginationRequest paginationRequest, 
 			string? searchQuery = null,
+			string? propertyType = null,
 			SortOptions sortOption = SortOptions.Default
 			)
 		{
@@ -26,6 +27,11 @@ namespace Interasian.API.Repositories
 			if (!string.IsNullOrEmpty(searchQuery)) 
 			{
 				query = query.Where(l => l.Title.Contains(searchQuery) || l.Location.Contains(searchQuery));
+			}
+
+			if (!string.IsNullOrEmpty(propertyType))
+			{
+				query = query.Where(l => l.PropertyType == propertyType);
 			}
 
 			query = ApplySorting(query, sortOption);

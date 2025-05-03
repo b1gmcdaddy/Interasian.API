@@ -19,6 +19,9 @@ namespace Interasian.API.DTOs
 		public string? Description { get; set; } = string.Empty;
 		[Required]
 		public bool Status { get; set; }
+		[Required]
+		public string PropertyType {get; set;} = string.Empty;
+		public string Owner {get; set;} = string.Empty;
 	}
 
 	public class ListingDTO : CreateListingDTO

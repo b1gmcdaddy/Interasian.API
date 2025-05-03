@@ -22,7 +22,11 @@ namespace Interasian.API.Models
 		public string? Description { get; set; } = string.Empty;
 		[Required]
 		public bool Status { get; set; }
-
+		[Required]
+		public string PropertyType {get; set;} = string.Empty;
+		[Required]
+		public string Owner {get; set;} = string.Empty;
+		
 		// Navigation property for image
 		public ICollection<ListingImage>? Images {get; set;} = new List<ListingImage>();
 	}
