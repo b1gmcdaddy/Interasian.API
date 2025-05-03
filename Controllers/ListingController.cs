@@ -3,10 +3,7 @@ using Interasian.API.DTOs;
 using Interasian.API.Models;
 using Interasian.API.Repositories;
 using Interasian.API.Utilities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Serilog;
 
 namespace Interasian.API.Controllers
@@ -49,7 +46,7 @@ namespace Interasian.API.Controllers
 		}
 
 		[HttpGet("{listingId}")]
-		public async Task<ActionResult<ListingDTO>> GetListingById(int listingId)
+		public async Task<ActionResult<ApiResponse>> GetListingById(int listingId)
 		{
 			try
 			{
@@ -60,7 +57,11 @@ namespace Interasian.API.Controllers
 				}
 
 				var dto = _mapper.Map<ListingDTO>(listing);
-				return Ok(dto);
+
+				return Ok(new ApiResponse(
+					true, 
+					"Listings retrieved successfully", 
+					dto));
 			}
 			catch (Exception ex)
 			{
@@ -70,7 +71,7 @@ namespace Interasian.API.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult<ListingDTO>> CreateListing(CreateListingDTO dto)
+		public async Task<ActionResult<ApiResponse>> CreateListing(CreateListingDTO dto)
 		{
 			try
 			{
@@ -78,18 +79,22 @@ namespace Interasian.API.Controllers
 				var created = await _repo.CreateListingAsync(listing);
 				var result = _mapper.Map<ListingDTO>(created);
 
-				return CreatedAtAction(nameof(GetListingById), new { listingId = result.ListingId }, result);
+				return CreatedAtAction(
+					nameof(GetListingById), 
+					new { listingId = result.ListingId }, 
+					new ApiResponse(true, "Listing created successfully", result));
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "err creating listing");
-				return StatusCode(500, "internal server err");
+				return StatusCode(500, new ApiResponse(
+					false, "Internal server error", null!));
 			}
 		}
 
 
 		[HttpPut("{listingId}")]
-		public async Task<IActionResult> UpdateListing(int listingId, CreateListingDTO dto)
+		public async Task<ActionResult<ApiResponse>> UpdateListing(int listingId, CreateListingDTO dto)
 		{
 			try
 			{
@@ -101,17 +106,17 @@ namespace Interasian.API.Controllers
 				_mapper.Map(dto, existing);
 				await _repo.UpdateListingAsync(existing);
 
-				return NoContent();
+				return Ok(new ApiResponse(true, "Listing updated successfully", null!));
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "err updating listing");
-				return StatusCode(500, "internal server err");
+				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
 			}
 		}
 
 		[HttpDelete("{listingId}")]
-		public async Task<IActionResult> Delete(int listingId)
+		public async Task<ActionResult<ApiResponse>> Delete(int listingId)
 		{
 			try
 			{
@@ -122,12 +127,12 @@ namespace Interasian.API.Controllers
 				}
 
 				await _repo.DeleteListingAsync(existing);
-				return NoContent();
+				return Ok(new ApiResponse(true, "Listing deleted successfully", null!));
 			}
 			catch (Exception ex)
 			{
 				Log.Error(ex, $"Error deleting listing with ID {listingId}");
-				return StatusCode(500, "Internal server error");
+				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
 			}
 		}
 	}
