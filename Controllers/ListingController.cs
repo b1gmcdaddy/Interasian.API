@@ -38,7 +38,12 @@ namespace Interasian.API.Controllers
 				var listings = await _repo.GetAllListingsAsync(paginationRequest, 
 				searchQuery, propertyType, sortOption);
 				var listingDtos = _mapper.Map<List<ListingDTO>>(listings);
-				return Ok(new ApiResponse(true, "Listings retrieved successfully", listingDtos));
+				var paginationDetails = PaginationMetadata.FromPagedList(listings);
+				return Ok(new ApiResponse(
+					true, 
+					"Listings retrieved successfully",
+					listingDtos,
+					paginationDetails));
 			}
 			catch (Exception ex)
 			{

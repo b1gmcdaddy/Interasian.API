@@ -4,7 +4,7 @@ namespace Interasian.API.DTOs
 {
 	public class PagedList<T> : List<T>
 	{
-		public int CurrentPage {get;set;}
+		public int CurrentPage {get; set;}
 		public int TotalPages { get; private set; }
     	public int PageSize { get; private set; }
     	public int TotalCount { get; private set; }
@@ -24,5 +24,5 @@ namespace Interasian.API.DTOs
             var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
-}
+	}	
 }

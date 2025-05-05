@@ -7,7 +7,7 @@ namespace Interasian.API.Repositories
 	public interface IListingImageRepository
 	{
 		Task<ListingImage> AddListingImageAsync(ListingImage image);
-        Task<IEnumerable<ListingImage>> GetListingImagesAsync(int listingId);
+        Task<PagedList<ListingImage>> GetListingImagesAsync(int listingId, PaginationRequest paginationRequest);
         Task<ListingImage> GetListingImageByIdAsync(int imageId);
         Task DeleteListingImageAsync(ListingImage image);
 	}

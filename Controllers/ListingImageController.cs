@@ -73,7 +73,7 @@ namespace Interasian.API.Controllers
 		}
 
 		[HttpGet("images/{listingId}")]
-		public async Task<ActionResult<ApiResponse>> GetListingImages(int listingId)
+		public async Task<ActionResult<ApiResponse>> GetListingImages(int listingId, [FromQuery] PaginationRequest paginationRequest)
 		{
 			try
 			{
@@ -83,15 +83,17 @@ namespace Interasian.API.Controllers
 					return NotFound(new ApiResponse(false, $"Listing with ID {listingId} not found", null!));
 				}
 				
-				var images = await _repo.GetListingImagesAsync(listingId);
+				var images = await _repo.GetListingImagesAsync(listingId, paginationRequest);
 				var imageDtos = _mapper.Map<List<ListingImageDTO>>(images);
+				var paginationDetails = PaginationMetadata.FromPagedList(images);
+
 				
 				foreach (var imageDto in imageDtos)
 				{
 					imageDto.ImageUrl = $"{Request.Scheme}://{Request.Host}/api/listing/image/{imageDto.ImageId}";
 				}
 				
-				return Ok(new ApiResponse(true, "Images retrieved successfully", imageDtos));
+				return Ok(new ApiResponse(true, "Images retrieved successfully", imageDtos, paginationDetails));
 			}
 			catch (Exception ex)
 			{

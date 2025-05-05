@@ -22,12 +22,15 @@ namespace Interasian.API.Repositories
             return image;
         }
         
-        public async Task<IEnumerable<ListingImage>> GetListingImagesAsync(int listingId)
+        public async Task<PagedList<ListingImage>> GetListingImagesAsync(int listingId, PaginationRequest paginationRequest)
         {
-            return await _context.ListingImages
-                .Where(i => i.ListingId == listingId)
-                .OrderByDescending(i => i.UploadDate)
-                .ToListAsync();
+            var query = _context.ListingImages
+                .Where(i => i.ListingId == listingId);
+                
+            return await PagedList<ListingImage>.ToPagedListAsync(
+                query,
+                paginationRequest.PageNumber,
+                paginationRequest.PageSize);
         }
         
         public async Task<ListingImage> GetListingImageByIdAsync(int imageId)
