@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Interasian.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+09a07687cd4a44e4477e4e5cec90f5a2d01f99f9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+163d6f70f7892c8837dd2cff593679b33b9f7487")]
 [assembly: System.Reflection.AssemblyProductAttribute("Interasian.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Interasian.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

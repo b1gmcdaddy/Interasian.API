@@ -1,6 +1,7 @@
 using Interasian.API.Data;
 using Interasian.API.MappingProfiles;
 using Interasian.API.Repositories;
+using Interasian.API.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,6 +20,9 @@ builder.Services.AddAutoMapper(typeof(Mapper));
 // Repositories
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
 builder.Services.AddScoped<IListingImageRepository, ListingImageRepository>();
+
+// Services
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Use the Serilog.AspNetCore NuGet Package
 Log.Logger = new LoggerConfiguration()

@@ -16,6 +16,21 @@
         "Name": "PageSize",
         "Type": "System.Int32",
         "IsRequired": false
+      },
+      {
+        "Name": "searchQuery",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "propertyType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "sortOption",
+        "Type": "System.String",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": [
@@ -46,7 +61,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "Interasian.API.DTOs.ListingDTO",
+        "Type": "Interasian.API.Utilities.ApiResponse",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -72,7 +87,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "Interasian.API.DTOs.ListingDTO",
+        "Type": "Interasian.API.Utilities.ApiResponse",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -101,7 +116,17 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "Interasian.API.Utilities.ApiResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "Interasian.API.Controllers.ListingController",
@@ -117,19 +142,9 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Interasian.API.Controllers.WeatherForecastController",
-    "Method": "Get",
-    "RelativePath": "WeatherForecast",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[Interasian.API.WeatherForecast, Interasian.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "Interasian.API.Utilities.ApiResponse",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -137,7 +152,105 @@
         ],
         "StatusCode": 200
       }
+    ]
+  },
+  {
+    "ContainingType": "Interasian.API.Controllers.ListingImageController",
+    "Method": "GetImage",
+    "RelativePath": "api/ListingImage/image/{imageId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "imageId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
     ],
-    "EndpointName": "GetWeatherForecast"
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Interasian.API.Controllers.ListingImageController",
+    "Method": "DeleteImage",
+    "RelativePath": "api/ListingImage/image/{imageId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "imageId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Interasian.API.Controllers.ListingImageController",
+    "Method": "GetListingImages",
+    "RelativePath": "api/ListingImage/images/{listingId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "listingId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "PageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "PageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Interasian.API.Utilities.ApiResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Interasian.API.Controllers.ListingImageController",
+    "Method": "UploadImage",
+    "RelativePath": "api/ListingImage/UploadImage",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      },
+      {
+        "Name": "listingId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Interasian.API.Utilities.ApiResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   }
 ]
