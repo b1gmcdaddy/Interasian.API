@@ -13,13 +13,20 @@ namespace Interasian.API.Controllers
 	public class ListingController : ControllerBase
 	{
 		private readonly IListingRepository _repo;
+		private readonly IListingImageRepository _imageRepo;
 		private readonly IMapper _mapper;
 		readonly ILogger<ListingController> _logger;
 		private readonly IWebHostEnvironment _environment;
 
-		public ListingController(IListingRepository repo, IMapper mapper, ILogger<ListingController> logger, IWebHostEnvironment environment)
+		public ListingController(
+			IListingRepository repo, 
+			IListingImageRepository imageRepo, 
+			IMapper mapper, 
+			ILogger<ListingController> logger, 
+			IWebHostEnvironment environment)
 		{
 			_repo = repo;
+			_imageRepo = imageRepo;
 			_mapper = mapper;
 			_logger = logger;
 			_environment = environment;
@@ -38,6 +45,21 @@ namespace Interasian.API.Controllers
 				var listings = await _repo.GetAllListingsAsync(paginationRequest, 
 				searchQuery, propertyType, sortOption);
 				var listingDtos = _mapper.Map<List<ListingDTO>>(listings);
+				
+				// Get list of imgs for each listing
+				foreach (var listingDto in listingDtos)
+				{
+					var imagePaginationRequest = new PaginationRequest { PageNumber = 1, PageSize = 20 };
+					var images = await _imageRepo.GetListingImagesAsync(listingDto.ListingId, imagePaginationRequest);
+					var imageDtos = _mapper.Map<List<ListingImageDTO>>(images);
+					
+					foreach (var imageDto in imageDtos)
+					{
+						imageDto.ImageUrl = $"{Request.Scheme}://{Request.Host}/api/ListingImage/image/{imageDto.ImageId}";
+					}
+					listingDto.Images = imageDtos;
+				}
+
 				var paginationDetails = PaginationMetadata.FromPagedList(listings);
 				return Ok(new ApiResponse(
 					true, 
@@ -64,6 +86,17 @@ namespace Interasian.API.Controllers
 				}
 
 				var dto = _mapper.Map<ListingDTO>(listing);
+				
+				var imagePaginationRequest = new PaginationRequest { PageNumber = 1, PageSize = 20 };
+				var images = await _imageRepo.GetListingImagesAsync(listingId, imagePaginationRequest);
+				var imageDtos = _mapper.Map<List<ListingImageDTO>>(images);
+				
+				foreach (var imageDto in imageDtos)
+				{
+					imageDto.ImageUrl = $"{Request.Scheme}://{Request.Host}/api/ListingImage/image/{imageDto.ImageId}";
+				}
+				
+				dto.Images = imageDtos;
 
 				return Ok(new ApiResponse(
 					true, 
