@@ -1,11 +1,13 @@
 ﻿using Interasian.API.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Interasian.API.Data
 {
-	public class DatabaseContext : DbContext
+	public class DatabaseContext : IdentityDbContext<User, IdentityRole, string>
 	{
-		public DatabaseContext(DbContextOptions options) : base(options)
+		public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
 		{
 		}
 
@@ -17,6 +19,24 @@ namespace Interasian.API.Data
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
+
+			// Seed Roles
+			modelBuilder.Entity<IdentityRole>().HasData(
+				new IdentityRole
+				{
+					Name = "User",
+					NormalizedName = "USER",
+					Id = Guid.NewGuid().ToString(),
+					ConcurrencyStamp = Guid.NewGuid().ToString()
+				},
+				new IdentityRole
+				{
+					Name = "Admin",
+					NormalizedName = "ADMIN",
+					Id = Guid.NewGuid().ToString(),
+					ConcurrencyStamp = Guid.NewGuid().ToString()
+				}
+			);
 
 			modelBuilder.Entity<ListingImage>()
 				.HasOne(i => i.Listing)

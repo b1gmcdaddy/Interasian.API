@@ -5,11 +5,13 @@ using Interasian.API.Repositories;
 using Interasian.API.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Interasian.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[Authorize]
 	public class ListingController : ControllerBase
 	{
 		private readonly IListingRepository _repo;
