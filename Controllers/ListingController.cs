@@ -11,7 +11,7 @@ namespace Interasian.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	[Authorize]
+	//[Authorize]
 	public class ListingController : ControllerBase
 	{
 		private readonly IListingRepository _repo;
