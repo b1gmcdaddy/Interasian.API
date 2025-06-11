@@ -4,6 +4,7 @@ using Interasian.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Interasian.API.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20250611114047_AddedCreatorFields")]
+    partial class AddedCreatorFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,7 +84,7 @@ namespace Interasian.API.Migrations
                             ListingId = 1,
                             BathRooms = 3,
                             BedRooms = 4,
-                            Creator = "jtangpuz@guardian.ph",
+                            Creator = "",
                             Description = "A luxurious villa with ocean view and private pool.",
                             FloorArea = "350 sqm",
                             LandArea = "500 sqm",
@@ -97,7 +100,7 @@ namespace Interasian.API.Migrations
                             ListingId = 2,
                             BathRooms = 1,
                             BedRooms = 2,
-                            Creator = "jtangpuz@guardian.ph",
+                            Creator = "",
                             Description = "Modern condo in the heart of the business district.",
                             FloorArea = "60 sqm",
                             LandArea = "60 sqm",
@@ -113,7 +116,7 @@ namespace Interasian.API.Migrations
                             ListingId = 3,
                             BathRooms = 8,
                             BedRooms = 8,
-                            Creator = "jtangpuz@guardian.ph",
+                            Creator = "",
                             Description = "Prime commercial building with 5 floors suitable for office spaces.",
                             FloorArea = "3500 sqm",
                             LandArea = "1200 sqm",
@@ -129,7 +132,7 @@ namespace Interasian.API.Migrations
                             ListingId = 4,
                             BathRooms = 5,
                             BedRooms = 5,
-                            Creator = "jtangpuz@guardian.ph",
+                            Creator = "",
                             Description = "Beautiful vacant lot with panoramic view of Taal Lake.",
                             LandArea = "800 sqm",
                             Location = "Lapu-Lapu City",
@@ -144,7 +147,7 @@ namespace Interasian.API.Migrations
                             ListingId = 5,
                             BathRooms = 4,
                             BedRooms = 5,
-                            Creator = "jtangpuz@guardian.ph",
+                            Creator = "",
                             Description = "Spacious family home in a gated community with garden and garage.",
                             FloorArea = "280 sqm",
                             LandArea = "350 sqm",

@@ -22,6 +22,7 @@ namespace Interasian.API.DTOs
 		[Required]
 		public string PropertyType {get; set;} = string.Empty;
 		public string Owner {get; set;} = string.Empty;
+		public string Creator {get; set;} = string.Empty;
 	}
 
 	public class ListingDTO : CreateListingDTO

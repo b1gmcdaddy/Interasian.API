@@ -1,11 +1,9 @@
 ﻿using Interasian.API.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Interasian.API.Data
 {
-	public class DatabaseContext : IdentityDbContext<User, IdentityRole, string>
+	public class DatabaseContext : DbContext
 	{
 		public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
 		{
@@ -19,24 +17,6 @@ namespace Interasian.API.Data
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
-
-			// Seed Roles
-			modelBuilder.Entity<IdentityRole>().HasData(
-				new IdentityRole
-				{
-					Name = "User",
-					NormalizedName = "USER",
-					Id = Guid.NewGuid().ToString(),
-					ConcurrencyStamp = Guid.NewGuid().ToString()
-				},
-				new IdentityRole
-				{
-					Name = "Admin",
-					NormalizedName = "ADMIN",
-					Id = Guid.NewGuid().ToString(),
-					ConcurrencyStamp = Guid.NewGuid().ToString()
-				}
-			);
 
 			modelBuilder.Entity<ListingImage>()
 				.HasOne(i => i.Listing)
@@ -58,7 +38,8 @@ namespace Interasian.API.Data
 					Description = "A luxurious villa with ocean view and private pool.",
 					Status = true,
 					PropertyType = "House with Lot",
-        			Owner = "John Smith"
+        			Owner = "John Smith",
+					Creator = "jtangpuz@guardian.ph"
 				},
 				new Listing
 				{
@@ -73,7 +54,8 @@ namespace Interasian.API.Data
 					Description = "Modern condo in the heart of the business district.",
 					Status = true,
 					PropertyType = "Condo",
-        			Owner = "Jane Doe"
+        			Owner = "Jane Doe",
+					Creator = "jtangpuz@guardian.ph"
 				},
 				new Listing
 				{
@@ -88,7 +70,8 @@ namespace Interasian.API.Data
 					Description = "Prime commercial building with 5 floors suitable for office spaces.",
 					Status = true,
 					PropertyType = "Commercial Building",
-					Owner = "Metro Properties Inc."
+					Owner = "Metro Properties Inc.",
+					Creator = "jtangpuz@guardian.ph"
 				},
 				new Listing
 				{
@@ -103,7 +86,8 @@ namespace Interasian.API.Data
 					Description = "Beautiful vacant lot with panoramic view of Taal Lake.",
 					Status = true,
 					PropertyType = "House with Lot",
-					Owner = "Connie Tangpuz"
+					Owner = "Connie Tangpuz",
+					Creator = "jtangpuz@guardian.ph"
 				},
 				new Listing
 				{
@@ -118,7 +102,8 @@ namespace Interasian.API.Data
 					Description = "Spacious family home in a gated community with garden and garage.",
 					Status = true,
 					PropertyType = "House with Lot",
-					Owner = "Maria Santos"
+					Owner = "Maria Santos",
+					Creator = "jtangpuz@guardian.ph"
 				}
 			);
 		}
