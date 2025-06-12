@@ -24,17 +24,77 @@ namespace Interasian.API.Controllers
             {
                 // UI of email content
                 var htmlContent = $@"
-                    <h2>New Contact Form Submission</h2>
-                    <p><strong>Name:</strong> {contactForm.Name}</p>
-                    <p><strong>Email:</strong> {contactForm.Email}</p>
-                    <p><strong>Subject:</strong> {contactForm.Subject}</p>
-                    <p><strong>Message:</strong></p>
-                    <p>{contactForm.Message}</p>
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <style>
+                            body {{
+                                font-family: Arial, sans-serif;
+                                line-height: 1.6;
+                                color: #333333;
+                                margin: 0;
+                                padding: 0;
+                            }}
+                            .email-container {{
+                                max-width: 600px;
+                                margin: 0 auto;
+                                padding: 20px;
+                            }}
+                            .header {{
+                                text-align: center;
+                                padding: 20px 0;
+                                border-bottom: 2px solid #f0f0f0;
+                            }}
+                            .logo {{
+                                max-width: 200px;
+                                height: auto;
+                            }}
+                            .content {{
+                                padding: 20px 0;
+                            }}
+                            .message-box {{
+                                background-color: #f9f9f9;
+                                border-left: 4px solid #4a90e2;
+                                padding: 15px;
+                                margin: 15px 0;
+                            }}
+                            .footer {{
+                                text-align: center;
+                                padding: 20px 0;
+                                border-top: 2px solid #f0f0f0;
+                                font-size: 12px;
+                                color: #666666;
+                            }}
+                        </style>
+                    </head>
+                    <body>
+                        <div class='email-container'>
+                            <div class='header'>
+                                <img src='https://interasianrealty.vercel.app/logo.png' alt='Inter Asian Realty Services Inc.' class='logo'>
+                                <h2 style='color: #2c3e50; margin-top: 15px;'>New Contact Form Submission</h2>
+                            </div>
+                            <div class='content'>
+                                <p><strong>Name:</strong> {contactForm.Name}</p>
+                                <p><strong>Email:</strong> {contactForm.Email}</p>
+                                <p><strong>Subject:</strong> {contactForm.Subject}</p>
+                                <p><strong>Phone:</strong> {contactForm.Phone}</p>
+                                <div class='message-box'>
+                                    <p><strong>Message:</strong></p>
+                                    <p>{contactForm.Message}</p>
+                                </div>
+                            </div>
+                            <div class='footer'>
+                                <p>This email was sent from the contact form on Inter Asian Realty Services Inc. website.</p>
+                                <p>© {DateTime.Now.Year} Inter Asian Realty Services Inc. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
                 ";
 
                 var email = new EmailDTO(
                     new[] { _configuration["EmailSettings:SenderEmail"] }, 
-                    $"Contact Form: {contactForm.Subject}",
+                    $"Inter Asian Realty Services Inc. - Contact Form Submission: {contactForm.Subject}",
                     htmlContent
                 );
 
