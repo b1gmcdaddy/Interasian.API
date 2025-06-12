@@ -22,7 +22,7 @@ namespace Interasian.API.Repositories
 			SortOptions sortOption = SortOptions.Default
 			)
 		{
-			var query = _context.Listings.AsQueryable();
+			var query = _context.Listings.Include(l => l.Images).AsQueryable();
 
 			if (!string.IsNullOrEmpty(searchQuery)) 
 			{
@@ -44,7 +44,9 @@ namespace Interasian.API.Repositories
 
 		public async Task<Listing?> GetListingByIdAsync(int listingId)
 		{
-			var listing = await _context.Listings.FindAsync(listingId);
+			var listing = await _context.Listings
+				.Include(l => l.Images)
+				.FirstOrDefaultAsync(l => l.ListingId == listingId);
 			return listing;
 		}
 

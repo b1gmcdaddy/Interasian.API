@@ -5,30 +5,30 @@ using Interasian.API.Repositories;
 using Interasian.API.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using Microsoft.AspNetCore.Authorization;
+using Interasian.API.Services;
+using CloudinaryDotNet.Actions;
 
 namespace Interasian.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	//[Authorize]
 	public class ListingController : ControllerBase
 	{
 		private readonly IListingRepository _repo;
-		private readonly IListingImageRepository _imageRepo;
+		private readonly IUploadService _uploadService;
 		private readonly IMapper _mapper;
 		readonly ILogger<ListingController> _logger;
 		private readonly IWebHostEnvironment _environment;
 
 		public ListingController(
 			IListingRepository repo, 
-			IListingImageRepository imageRepo, 
+			IUploadService uploadService, 
 			IMapper mapper, 
 			ILogger<ListingController> logger, 
 			IWebHostEnvironment environment)
 		{
 			_repo = repo;
-			_imageRepo = imageRepo;
+			_uploadService = uploadService;
 			_mapper = mapper;
 			_logger = logger;
 			_environment = environment;
@@ -51,15 +51,11 @@ namespace Interasian.API.Controllers
 				// Get list of imgs for each listing
 				foreach (var listingDto in listingDtos)
 				{
-					var imagePaginationRequest = new PaginationRequest { PageNumber = 1, PageSize = 20 };
-					var images = await _imageRepo.GetListingImagesAsync(listingDto.ListingId, imagePaginationRequest);
-					var imageDtos = _mapper.Map<List<ListingImageDTO>>(images);
-					
-					foreach (var imageDto in imageDtos)
+					var listing = listings.FirstOrDefault(l => l.ListingId == listingDto.ListingId);
+					if (listing?.Images != null)
 					{
-						imageDto.ImageUrl = $"{Request.Scheme}://{Request.Host}/api/ListingImage/image/{imageDto.ImageId}";
+						listingDto.Images = _mapper.Map<List<ListingImageDTO>>(listing.Images);
 					}
-					listingDto.Images = imageDtos;
 				}
 
 				var paginationDetails = PaginationMetadata.FromPagedList(listings);
@@ -84,31 +80,23 @@ namespace Interasian.API.Controllers
 				var listing = await _repo.GetListingByIdAsync(listingId);
 				if (listing is null)
 				{
-					return NotFound();
+					return NotFound(new ApiResponse(false, "Listing not found", null!));
 				}
 
 				var dto = _mapper.Map<ListingDTO>(listing);
 				
-				var imagePaginationRequest = new PaginationRequest { PageNumber = 1, PageSize = 20 };
-				var images = await _imageRepo.GetListingImagesAsync(listingId, imagePaginationRequest);
-				var imageDtos = _mapper.Map<List<ListingImageDTO>>(images);
-				
-				foreach (var imageDto in imageDtos)
+				// Include images in the response
+				if (listing.Images != null)
 				{
-					imageDto.ImageUrl = $"{Request.Scheme}://{Request.Host}/api/ListingImage/image/{imageDto.ImageId}";
+					dto.Images = _mapper.Map<List<ListingImageDTO>>(listing.Images);
 				}
-				
-				dto.Images = imageDtos;
 
-				return Ok(new ApiResponse(
-					true, 
-					"Listings retrieved successfully", 
-					dto));
+				return Ok(new ApiResponse(true, "Listing retrieved successfully", dto));
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, $"Error fetching listing with id: {listingId}");
-				return StatusCode(500, "internal server err");
+				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
 			}
 		}
 
@@ -134,6 +122,82 @@ namespace Interasian.API.Controllers
 			}
 		}
 
+		[HttpPost("{listingId}/images")]
+		public async Task<ActionResult<ApiResponse>> UploadImages(int listingId, IFormFileCollection files)
+		{
+			try
+			{
+				var listing = await _repo.GetListingByIdAsync(listingId);
+				if (listing is null)
+				{
+					return NotFound(new ApiResponse(false, "Listing not found", null!));
+				}
+
+				var uploadResults = await _uploadService.AddMultiplePhotosAsync(files);
+				var images = new List<ListingImage>();
+
+				foreach (var result in uploadResults)
+				{
+					var image = new ListingImage
+					{
+						ListingId = listingId,
+						FileName = result.SecureUrl.ToString(),
+						UploadDate = DateTime.UtcNow
+					};
+					images.Add(image);
+				}
+
+				if (listing.Images == null)
+				{
+					listing.Images = new List<ListingImage>();
+				}
+				foreach (var image in images)
+				{
+					listing.Images.Add(image);
+				}
+
+				await _repo.UpdateListingAsync(listing);
+				var imageDTOs = _mapper.Map<List<ListingImageDTO>>(images);
+				return Ok(new ApiResponse(true, "Images uploaded successfully", imageDTOs));
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, $"Error uploading images for listing {listingId}");
+				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
+			}
+		}
+
+		[HttpDelete("{listingId}/images/{imageId}")]
+		public async Task<ActionResult<ApiResponse>> DeleteImage(int listingId, int imageId)
+		{
+			try
+			{
+				var listing = await _repo.GetListingByIdAsync(listingId);
+				if (listing is null)
+				{
+					return NotFound(new ApiResponse(false, "Listing not found", null!));
+				}
+
+				var image = listing.Images?.FirstOrDefault(i => i.ImageId == imageId);
+				if (image is null)
+				{
+					return NotFound(new ApiResponse(false, "Image not found", null!));
+				}
+
+				var publicId = image.FileName.Split('/').Last().Split('.')[0];
+				await _uploadService.DeletePhotoAsync(publicId);
+
+				listing.Images?.Remove(image);
+				await _repo.UpdateListingAsync(listing);
+
+				return Ok(new ApiResponse(true, "Image deleted successfully", null!));
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, $"Error deleting image {imageId} from listing {listingId}");
+				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
+			}
+		}
 
 		[HttpPut("{listingId}")]
 		public async Task<ActionResult<ApiResponse>> UpdateListing(int listingId, CreateListingDTO dto)

@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Interasian.API.Models;
+using Interasian.API.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,11 +23,15 @@ builder.Services.AddAutoMapper(typeof(Mapper));
 
 // Repositories
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
-builder.Services.AddScoped<IListingImageRepository, ListingImageRepository>();
+//builder.Services.AddScoped<IListingImageRepository, ListingImageRepository>();
 //builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 // Services
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IUploadService, UploadService>();
+
+// Utils
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
 // Use the Serilog.AspNetCore NuGet Package
 Log.Logger = new LoggerConfiguration()
