@@ -23,8 +23,7 @@ builder.Services.AddAutoMapper(typeof(Mapper));
 
 // Repositories
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
-//builder.Services.AddScoped<IListingImageRepository, ListingImageRepository>();
-//builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+
 
 // Services
 builder.Services.AddScoped<IEmailService, EmailService>();

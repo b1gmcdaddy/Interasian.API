@@ -232,8 +232,17 @@ namespace Interasian.API.Controllers
 					return NotFound();
 				}
 
+				if (existing.Images != null)
+				{
+					foreach (var image in existing.Images)
+					{
+						var publicId = image.FileName.Split('/').Last().Split('.')[0];
+						await _uploadService.DeletePhotoAsync(publicId);
+					}
+				}
+
 				await _repo.DeleteListingAsync(existing);
-				return Ok(new ApiResponse(true, "Listing deleted successfully", null!));
+				return Ok(new ApiResponse(true, "Listing and associated images deleted successfully", null!));
 			}
 			catch (Exception ex)
 			{
