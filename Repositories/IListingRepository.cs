@@ -13,6 +13,7 @@ namespace Interasian.API.Repositories
 			SortOptions sortOption = SortOptions.Default
 			);
 		Task<Listing?> GetListingByIdAsync(int listingId);
+		Task<IEnumerable<PropertyTypeCount>> GetCountByPropertyTypeAsync();
 		Task<Listing> CreateListingAsync(Listing listing);
 		Task UpdateListingAsync(Listing listing);
 		Task DeleteListingAsync(Listing listing);

@@ -100,6 +100,24 @@ namespace Interasian.API.Controllers
 			}
 		}
 
+		[HttpGet("count")]
+		public async Task<ActionResult<ApiResponse>> GetCountByPropertyType()
+		{
+			try
+			{
+				var counts = await _repo.GetCountByPropertyTypeAsync();
+				return Ok(new ApiResponse(
+					true,
+					"Count for property types retrieved successfully",
+					counts,
+					null));
+			} catch (Exception ex)
+			{
+				_logger.LogError(ex, $"Error fetching counts per property type");
+				return StatusCode(500, new ApiResponse(false, "Internal Server Error", null!));
+			}
+		}
+
 		[HttpPost]
 		public async Task<ActionResult<ApiResponse>> CreateListing(CreateListingDTO dto)
 		{

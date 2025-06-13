@@ -14,7 +14,7 @@ namespace Interasian.API.Repositories
 		{
 			_context = context;
 		}
-
+		// GET ALL LISTINGS
 		public async Task<PagedList<Listing>> GetAllListingsAsync(
 			PaginationRequest paginationRequest, 
 			string? searchQuery = null,
@@ -41,7 +41,7 @@ namespace Interasian.API.Repositories
 				paginationRequest.PageNumber, 
 				paginationRequest.PageSize);	
 		}
-
+		// GET SPECIFIC LISTING
 		public async Task<Listing?> GetListingByIdAsync(int listingId)
 		{
 			var listing = await _context.Listings
@@ -50,19 +50,34 @@ namespace Interasian.API.Repositories
 			return listing;
 		}
 
+		// GET COUNT
+		public async Task<IEnumerable<PropertyTypeCount>> GetCountByPropertyTypeAsync()
+		{
+			var counts = await _context.Listings.GroupBy(p => p.PropertyType)
+				.Select(g => new PropertyTypeCount
+				{
+					PropertyType = g.Key,
+					Count = g.Count()
+				})
+				.ToListAsync();
+
+			return counts;
+
+		}
+		// CREATE LISTING
 		public async Task<Listing> CreateListingAsync(Listing listing)
 		{
 			_context.Listings.Add(listing);
 			await _context.SaveChangesAsync();
 			return listing;
 		}
-
+		// UPDATE LISTING
 		public async Task UpdateListingAsync(Listing listing)
 		{
 			_context.Listings.Update(listing);
 			await _context.SaveChangesAsync();
 		}
-
+		// DELETE LISTING
 		public async Task DeleteListingAsync(Listing listing)
 		{
 			_context.Listings.Remove(listing);
@@ -72,6 +87,7 @@ namespace Interasian.API.Repositories
 		public async Task<bool> ListingExistsAsync(int id) =>
 			await _context.Listings.AnyAsync(l => l.ListingId == id);
 
+		// SORT LISTINGS
 		private IQueryable<Listing> ApplySorting(IQueryable<Listing> query, SortOptions sortOption)
         {
             return sortOption switch
