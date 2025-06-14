@@ -1,13 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Interasian.API.Models;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Interasian.API.Models
 {
 	public class Listing
 	{
-		[Key, Required]
-		public int ListingId { get; set; }
+		[BsonId]
+		[BsonRepresentation(BsonType.ObjectId)]
+		public string Id { get; set; } = string.Empty;
+		
 		[Required]
 		public string Title { get; set; } = string.Empty;
 		[Required]
@@ -17,7 +21,7 @@ namespace Interasian.API.Models
 		public int? BedRooms { get; set; }
 		public int? BathRooms { get; set; }
 		
-		[Column(TypeName = "decimal(18,2)")]
+		[BsonRepresentation(BsonType.Decimal128)]
 		[Required]
 		public decimal Price { get; set; }
 		public string? Description { get; set; } = string.Empty;
@@ -31,6 +35,6 @@ namespace Interasian.API.Models
 		public string Creator {get; set;} = string.Empty;
 		
 		// Navigation property for image
-		public ICollection<ListingImage>? Images {get; set;} = new List<ListingImage>();
+		public List<string>? ImageIds {get; set;} = new List<string>();
 	}
 }

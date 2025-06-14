@@ -27,7 +27,7 @@ namespace Interasian.API.DTOs
 
 	public class ListingDTO : CreateListingDTO
 	{
-		public int ListingId { get; set; }
+		public string Id { get; set; } = string.Empty;
 		public List<ListingImageDTO>? Images { get; set; } = new List<ListingImageDTO>();
 	}
 }

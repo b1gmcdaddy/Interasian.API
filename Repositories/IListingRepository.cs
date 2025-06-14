@@ -12,12 +12,11 @@ namespace Interasian.API.Repositories
 			string? propertyType = null,
 			SortOptions sortOption = SortOptions.Default
 			);
-		Task<Listing?> GetListingByIdAsync(int listingId);
+		Task<Listing?> GetListingByIdAsync(string listingId);
 		Task<IEnumerable<PropertyTypeCount>> GetCountByPropertyTypeAsync();
 		Task<Listing> CreateListingAsync(Listing listing);
 		Task UpdateListingAsync(Listing listing);
 		Task DeleteListingAsync(Listing listing);
-		Task<bool> ListingExistsAsync(int listingId);
-
+		Task<bool> ListingExistsAsync(string listingId);
 	}
 }

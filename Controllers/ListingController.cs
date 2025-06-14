@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Interasian.API.Services;
 using CloudinaryDotNet.Actions;
-
+using MongoDB.Driver;
+using Interasian.API.Data;
 namespace Interasian.API.Controllers
 {
 	[Route("api/[controller]")]
@@ -19,19 +20,22 @@ namespace Interasian.API.Controllers
 		private readonly IMapper _mapper;
 		readonly ILogger<ListingController> _logger;
 		private readonly IWebHostEnvironment _environment;
+		private readonly MongoDbContext _mongoContext;
 
 		public ListingController(
 			IListingRepository repo, 
 			IUploadService uploadService, 
 			IMapper mapper, 
 			ILogger<ListingController> logger, 
-			IWebHostEnvironment environment)
+			IWebHostEnvironment environment,
+			MongoDbContext mongoContext)
 		{
 			_repo = repo;
 			_uploadService = uploadService;
 			_mapper = mapper;
 			_logger = logger;
 			_environment = environment;
+			_mongoContext = mongoContext;
 		}
 
 		[HttpGet]
@@ -51,10 +55,13 @@ namespace Interasian.API.Controllers
 				// Get list of imgs for each listing
 				foreach (var listingDto in listingDtos)
 				{
-					var listing = listings.FirstOrDefault(l => l.ListingId == listingDto.ListingId);
-					if (listing?.Images != null)
+					var listing = listings.FirstOrDefault(l => l.Id == listingDto.Id);
+					if (listing?.ImageIds != null)
 					{
-						listingDto.Images = _mapper.Map<List<ListingImageDTO>>(listing.Images);
+						var images = await _mongoContext.ListingImages
+							.Find(x => listing.ImageIds.Contains(x.Id))
+							.ToListAsync();
+						listingDto.Images = _mapper.Map<List<ListingImageDTO>>(images);
 					}
 				}
 
@@ -73,7 +80,7 @@ namespace Interasian.API.Controllers
 		}
 
 		[HttpGet("{listingId}")]
-		public async Task<ActionResult<ApiResponse>> GetListingById(int listingId)
+		public async Task<ActionResult<ApiResponse>> GetListingById(string listingId)
 		{
 			try
 			{
@@ -86,9 +93,12 @@ namespace Interasian.API.Controllers
 				var dto = _mapper.Map<ListingDTO>(listing);
 				
 				// Include images in the response
-				if (listing.Images != null)
+				if (listing.ImageIds != null)
 				{
-					dto.Images = _mapper.Map<List<ListingImageDTO>>(listing.Images);
+					var images = await _mongoContext.ListingImages
+						.Find(x => listing.ImageIds.Contains(x.Id))
+						.ToListAsync();
+					dto.Images = _mapper.Map<List<ListingImageDTO>>(images);
 				}
 
 				return Ok(new ApiResponse(true, "Listing retrieved successfully", dto));
@@ -129,7 +139,7 @@ namespace Interasian.API.Controllers
 
 				return CreatedAtAction(
 					nameof(GetListingById), 
-					new { listingId = result.ListingId }, 
+					new { listingId = result.Id }, 
 					new ApiResponse(true, "Listing created successfully", result));
 			}
 			catch (Exception ex)
@@ -141,7 +151,7 @@ namespace Interasian.API.Controllers
 		}
 
 		[HttpPost("{listingId}/images")]
-		public async Task<ActionResult<ApiResponse>> UploadImages(int listingId, IFormFileCollection files)
+		public async Task<ActionResult<ApiResponse>> UploadImages(string listingId, IFormFileCollection files)
 		{
 			try
 			{
@@ -162,17 +172,15 @@ namespace Interasian.API.Controllers
 						FileName = result.SecureUrl.ToString(),
 						UploadDate = DateTime.UtcNow
 					};
+					await _mongoContext.ListingImages.InsertOneAsync(image);
 					images.Add(image);
 				}
 
-				if (listing.Images == null)
+				if (listing.ImageIds == null)
 				{
-					listing.Images = new List<ListingImage>();
+					listing.ImageIds = new List<string>();
 				}
-				foreach (var image in images)
-				{
-					listing.Images.Add(image);
-				}
+				listing.ImageIds.AddRange(images.Select(i => i.Id));
 
 				await _repo.UpdateListingAsync(listing);
 				var imageDTOs = _mapper.Map<List<ListingImageDTO>>(images);
@@ -186,7 +194,7 @@ namespace Interasian.API.Controllers
 		}
 
 		[HttpDelete("{listingId}/images/{imageId}")]
-		public async Task<ActionResult<ApiResponse>> DeleteImage(int listingId, int imageId)
+		public async Task<ActionResult<ApiResponse>> DeleteImage(string listingId, string imageId)
 		{
 			try
 			{
@@ -196,7 +204,7 @@ namespace Interasian.API.Controllers
 					return NotFound(new ApiResponse(false, "Listing not found", null!));
 				}
 
-				var image = listing.Images?.FirstOrDefault(i => i.ImageId == imageId);
+				var image = await _mongoContext.ListingImages.Find(x => x.Id == imageId).FirstOrDefaultAsync();
 				if (image is null)
 				{
 					return NotFound(new ApiResponse(false, "Image not found", null!));
@@ -205,7 +213,8 @@ namespace Interasian.API.Controllers
 				var publicId = image.FileName.Split('/').Last().Split('.')[0];
 				await _uploadService.DeletePhotoAsync(publicId);
 
-				listing.Images?.Remove(image);
+				await _mongoContext.ListingImages.DeleteOneAsync(x => x.Id == imageId);
+				listing.ImageIds?.Remove(imageId);
 				await _repo.UpdateListingAsync(listing);
 
 				return Ok(new ApiResponse(true, "Image deleted successfully", null!));
@@ -218,7 +227,7 @@ namespace Interasian.API.Controllers
 		}
 
 		[HttpPut("{listingId}")]
-		public async Task<ActionResult<ApiResponse>> UpdateListing(int listingId, CreateListingDTO dto)
+		public async Task<ActionResult<ApiResponse>> UpdateListing(string listingId, CreateListingDTO dto)
 		{
 			try
 			{
@@ -240,7 +249,7 @@ namespace Interasian.API.Controllers
 		}
 
 		[HttpDelete("{listingId}")]
-		public async Task<ActionResult<ApiResponse>> Delete(int listingId)
+		public async Task<ActionResult<ApiResponse>> Delete(string listingId)
 		{
 			try
 			{
@@ -250,13 +259,19 @@ namespace Interasian.API.Controllers
 					return NotFound();
 				}
 
-				if (existing.Images != null)
+				if (existing.ImageIds != null)
 				{
-					foreach (var image in existing.Images)
+					var images = await _mongoContext.ListingImages
+						.Find(x => existing.ImageIds.Contains(x.Id))
+						.ToListAsync();
+
+					foreach (var image in images)
 					{
 						var publicId = image.FileName.Split('/').Last().Split('.')[0];
 						await _uploadService.DeletePhotoAsync(publicId);
 					}
+
+					await _mongoContext.ListingImages.DeleteManyAsync(x => existing.ImageIds.Contains(x.Id));
 				}
 
 				await _repo.DeleteListingAsync(existing);

@@ -2,7 +2,6 @@ using Interasian.API.Data;
 using Interasian.API.MappingProfiles;
 using Interasian.API.Repositories;
 using Interasian.API.Services;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -14,20 +13,22 @@ using Interasian.API.Utilities;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Mapper));
 
+// MongoDB Context
+builder.Services.AddSingleton<MongoDbContext>();
+
 // Repositories
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
-
 
 // Services
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUploadService, UploadService>();
+builder.Services.AddSingleton<DataMigrationService>();
 
 // Utils
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
@@ -42,44 +43,13 @@ Log.Logger = new LoggerConfiguration()
 // Use the Serilog.AspNetCore NuGet Package
 builder.Host.UseSerilog();
 
-// Use Dbb Context
-builder.Services.AddDbContext<DatabaseContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"));
-});
-
-
-// Configure Identity
-//builder.Services.AddIdentity<Use>()
-//	.AddEntityFrameworkStores<DatabaseContext>() 
-//	.AddDefaultTokenProviders();
-
-// Configure JWT Authentication
-//var jwtSettings = builder.Configuration.GetSection("JwtConfig");
-//var key = Encoding.UTF8.GetBytes(jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key not found"));
-
-//builder.Services.AddAuthentication(options =>
-//{
-//	options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//	options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//})
-//.AddJwtBearer(options =>
-//{
-//	options.TokenValidationParameters = new TokenValidationParameters
-//	{
-//		ValidateIssuer = true,
-//		ValidateAudience = true,
-//		ValidateLifetime = true,
-//		ValidateIssuerSigningKey = true,
-//		ValidIssuer = jwtSettings["Issuer"],
-//		ValidAudience = jwtSettings["Audience"],
-//		IssuerSigningKey = new SymmetricSecurityKey(key)
-//	};
-//});
-
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+// Migrate data on startup
+var migrationService = app.Services.GetRequiredService<DataMigrationService>();
+await migrationService.MigrateDataAsync();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

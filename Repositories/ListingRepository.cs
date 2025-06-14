@@ -1,16 +1,17 @@
 ﻿using Interasian.API.Data;
 using Interasian.API.Models;
-using Microsoft.EntityFrameworkCore;
 using Interasian.API.Utilities;
 using Interasian.API.DTOs;
+using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace Interasian.API.Repositories
 {
 	public class ListingRepository : IListingRepository
 	{
-		private readonly DatabaseContext _context;
+		private readonly MongoDbContext _context;
 
-		public ListingRepository(DatabaseContext context)
+		public ListingRepository(MongoDbContext context)
 		{
 			_context = context;
 		}
@@ -22,83 +23,92 @@ namespace Interasian.API.Repositories
 			SortOptions sortOption = SortOptions.Default
 			)
 		{
-			var query = _context.Listings.Include(l => l.Images).AsQueryable();
+			var filter = Builders<Listing>.Filter.Empty;
 
 			if (!string.IsNullOrEmpty(searchQuery)) 
 			{
-				query = query.Where(l => l.Title.Contains(searchQuery) || l.Location.Contains(searchQuery));
+				var searchFilter = Builders<Listing>.Filter.Or(
+					Builders<Listing>.Filter.Regex(x => x.Title, new MongoDB.Bson.BsonRegularExpression(searchQuery, "i")),
+					Builders<Listing>.Filter.Regex(x => x.Location, new MongoDB.Bson.BsonRegularExpression(searchQuery, "i"))
+				);
+				filter &= searchFilter;
 			}
 
 			if (!string.IsNullOrEmpty(propertyType))
 			{
-				query = query.Where(l => l.PropertyType == propertyType);
+				filter &= Builders<Listing>.Filter.Eq(x => x.PropertyType, propertyType);
 			}
 
+			var query = _context.Listings.Find(filter);
 			query = ApplySorting(query, sortOption);
 
-			return await PagedList<Listing>.ToPagedListAsync(
-				query, 
-				paginationRequest.PageNumber, 
-				paginationRequest.PageSize);	
+			var totalCount = await query.CountDocumentsAsync();
+			var items = await query
+				.Skip((paginationRequest.PageNumber - 1) * paginationRequest.PageSize)
+				.Limit(paginationRequest.PageSize)
+				.ToListAsync();
+
+			return new PagedList<Listing>(items, (int)totalCount, paginationRequest.PageNumber, paginationRequest.PageSize);
 		}
 		// GET SPECIFIC LISTING
-		public async Task<Listing?> GetListingByIdAsync(int listingId)
+		public async Task<Listing?> GetListingByIdAsync(string listingId)
 		{
-			var listing = await _context.Listings
-				.Include(l => l.Images)
-				.FirstOrDefaultAsync(l => l.ListingId == listingId);
-			return listing;
+			return await _context.Listings.Find(x => x.Id == listingId).FirstOrDefaultAsync();
 		}
 
 		// GET COUNT
 		public async Task<IEnumerable<PropertyTypeCount>> GetCountByPropertyTypeAsync()
 		{
-			var counts = await _context.Listings.GroupBy(p => p.PropertyType)
-				.Select(g => new PropertyTypeCount
+			var pipeline = new BsonDocument[]
+			{
+				new BsonDocument("$group", new BsonDocument
 				{
-					PropertyType = g.Key,
-					Count = g.Count()
+					{ "_id", "$PropertyType" },
+					{ "Count", new BsonDocument("$sum", 1) }
+				}),
+				new BsonDocument("$project", new BsonDocument
+				{
+					{ "PropertyType", "$_id" },
+					{ "Count", 1 },
+					{ "_id", 0 }
 				})
-				.ToListAsync();
+			};
 
-			return counts;
-
+			var result = await _context.Listings.Aggregate<PropertyTypeCount>(pipeline).ToListAsync();
+			return result;
 		}
 		// CREATE LISTING
 		public async Task<Listing> CreateListingAsync(Listing listing)
 		{
-			_context.Listings.Add(listing);
-			await _context.SaveChangesAsync();
+			await _context.Listings.InsertOneAsync(listing);
 			return listing;
 		}
 		// UPDATE LISTING
 		public async Task UpdateListingAsync(Listing listing)
 		{
-			_context.Listings.Update(listing);
-			await _context.SaveChangesAsync();
+			await _context.Listings.ReplaceOneAsync(x => x.Id == listing.Id, listing);
 		}
 		// DELETE LISTING
 		public async Task DeleteListingAsync(Listing listing)
 		{
-			_context.Listings.Remove(listing);
-			await _context.SaveChangesAsync();
+			await _context.Listings.DeleteOneAsync(x => x.Id == listing.Id);
 		}
 
-		public async Task<bool> ListingExistsAsync(int id) =>
-			await _context.Listings.AnyAsync(l => l.ListingId == id);
+		public async Task<bool> ListingExistsAsync(string id) =>
+			await _context.Listings.CountDocumentsAsync(x => x.Id == id) > 0;
 
 		// SORT LISTINGS
-		private IQueryable<Listing> ApplySorting(IQueryable<Listing> query, SortOptions sortOption)
+		private IFindFluent<Listing, Listing> ApplySorting(IFindFluent<Listing, Listing> query, SortOptions sortOption)
         {
             return sortOption switch
             {
-                SortOptions.PriceAsc => query.OrderBy(l => l.Price),
-                SortOptions.PriceDesc => query.OrderByDescending(l => l.Price),
-                SortOptions.BedroomsAsc => query.OrderBy(l => l.BedRooms),
-                SortOptions.BedroomsDesc => query.OrderByDescending(l => l.BedRooms),
-                SortOptions.BathroomsAsc => query.OrderBy(l => l.BathRooms),
-                SortOptions.BathroomsDesc => query.OrderByDescending(l => l.BathRooms),
-                _ => query.OrderBy(l => l.ListingId) 
+                SortOptions.PriceAsc => query.Sort(Builders<Listing>.Sort.Ascending(x => x.Price)),
+                SortOptions.PriceDesc => query.Sort(Builders<Listing>.Sort.Descending(x => x.Price)),
+                SortOptions.BedroomsAsc => query.Sort(Builders<Listing>.Sort.Ascending(x => x.BedRooms)),
+                SortOptions.BedroomsDesc => query.Sort(Builders<Listing>.Sort.Descending(x => x.BedRooms)),
+                SortOptions.BathroomsAsc => query.Sort(Builders<Listing>.Sort.Ascending(x => x.BathRooms)),
+                SortOptions.BathroomsDesc => query.Sort(Builders<Listing>.Sort.Descending(x => x.BathRooms)),
+                _ => query.Sort(Builders<Listing>.Sort.Ascending(x => x.Id))
             };
         }
 	}

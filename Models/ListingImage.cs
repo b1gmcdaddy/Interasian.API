@@ -1,21 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace Interasian.API.Models
 {
 	public class ListingImage
 	{
-		[Key]
-		public int ImageId { get; set; }
+		[BsonId]
+		[BsonRepresentation(BsonType.ObjectId)]
+		public string Id { get; set; } = string.Empty;
+		
 		[Required]
-		public int ListingId { get; set; }
+		public string ListingId { get; set; } = string.Empty;
 		[Required]
 		public string FileName { get; set; } = string.Empty;
 		[Required]
 		public DateTime UploadDate { get; set; }
-
-		[ForeignKey("ListingId")]
-		public Listing? Listing { get; set; }
 	}
 }

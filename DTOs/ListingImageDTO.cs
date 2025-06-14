@@ -2,9 +2,9 @@ namespace Interasian.API.DTOs
 {
     public class ListingImageDTO
     {
-        public int ImageId {get; set;}
-        public int ListingId { get; set; }
-        public string FileName {get; set;} = string.Empty;
-        public DateTime UploadDate {get; set;}
+        public string Id { get; set; } = string.Empty;
+        public string ListingId { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
+        public DateTime UploadDate { get; set; }
     }
 }

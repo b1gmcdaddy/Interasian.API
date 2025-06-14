@@ -2,7 +2,7 @@
 {
 	public class PropertyTypeCount
 	{
-		public string PropertyType { get; set; }
+		public required string PropertyType { get; set; }
 		public int Count { get; set; }
 	}
 }
