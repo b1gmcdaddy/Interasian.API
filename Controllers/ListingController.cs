@@ -6,7 +6,6 @@ using Interasian.API.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Interasian.API.Services;
-using CloudinaryDotNet.Actions;
 using MongoDB.Driver;
 using Interasian.API.Data;
 namespace Interasian.API.Controllers
@@ -38,6 +37,7 @@ namespace Interasian.API.Controllers
 			_mongoContext = mongoContext;
 		}
 
+		#region Get Listings
 		[HttpGet]
 		public async Task<ActionResult<ApiResponse>> GetAllListings(
 			[FromQuery] PaginationRequest paginationRequest, 
@@ -52,7 +52,6 @@ namespace Interasian.API.Controllers
 				searchQuery, propertyType, sortOption);
 				var listingDtos = _mapper.Map<List<ListingDTO>>(listings);
 				
-				// Get list of imgs for each listing
 				foreach (var listingDto in listingDtos)
 				{
 					var listing = listings.FirstOrDefault(l => l.Id == listingDto.Id);
@@ -78,7 +77,9 @@ namespace Interasian.API.Controllers
 				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
 			}
 		}
+		#endregion
 
+		#region Get Listing by Id
 		[HttpGet("{listingId}")]
 		public async Task<ActionResult<ApiResponse>> GetListingById(string listingId)
 		{
@@ -92,7 +93,6 @@ namespace Interasian.API.Controllers
 
 				var dto = _mapper.Map<ListingDTO>(listing);
 				
-				// Include images in the response
 				if (listing.ImageIds != null)
 				{
 					var images = await _mongoContext.ListingImages
@@ -109,7 +109,9 @@ namespace Interasian.API.Controllers
 				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
 			}
 		}
+		#endregion
 
+		#region Get Count by Property Type
 		[HttpGet("count")]
 		public async Task<ActionResult<ApiResponse>> GetCountByPropertyType()
 		{
@@ -127,7 +129,9 @@ namespace Interasian.API.Controllers
 				return StatusCode(500, new ApiResponse(false, "Internal Server Error", null!));
 			}
 		}
+		#endregion
 
+		#region Create Listing
 		[HttpPost]
 		public async Task<ActionResult<ApiResponse>> CreateListing(CreateListingDTO dto)
 		{
@@ -149,7 +153,9 @@ namespace Interasian.API.Controllers
 					false, "Internal server error", null!));
 			}
 		}
+		#endregion
 
+		#region Upload Images
 		[HttpPost("{listingId}/images")]
 		public async Task<ActionResult<ApiResponse>> UploadImages(string listingId, IFormFileCollection files)
 		{
@@ -192,7 +198,9 @@ namespace Interasian.API.Controllers
 				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
 			}
 		}
+		#endregion
 
+		#region Delete Image
 		[HttpDelete("{listingId}/images/{imageId}")]
 		public async Task<ActionResult<ApiResponse>> DeleteImage(string listingId, string imageId)
 		{
@@ -225,7 +233,9 @@ namespace Interasian.API.Controllers
 				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
 			}
 		}
+		#endregion
 
+		#region Update Listing
 		[HttpPut("{listingId}")]
 		public async Task<ActionResult<ApiResponse>> UpdateListing(string listingId, CreateListingDTO dto)
 		{
@@ -247,7 +257,9 @@ namespace Interasian.API.Controllers
 				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
 			}
 		}
+		#endregion
 
+		#region Delete Listing
 		[HttpDelete("{listingId}")]
 		public async Task<ActionResult<ApiResponse>> Delete(string listingId)
 		{
@@ -283,5 +295,6 @@ namespace Interasian.API.Controllers
 				return StatusCode(500, new ApiResponse(false, "Internal server error", null!));
 			}
 		}
+		#endregion
 	}
 }

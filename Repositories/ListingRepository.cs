@@ -15,7 +15,7 @@ namespace Interasian.API.Repositories
 		{
 			_context = context;
 		}
-		// GET ALL LISTINGS
+		#region GET ALL LISTINGS
 		public async Task<PagedList<Listing>> GetAllListingsAsync(
 			PaginationRequest paginationRequest, 
 			string? searchQuery = null,
@@ -50,13 +50,16 @@ namespace Interasian.API.Repositories
 
 			return new PagedList<Listing>(items, (int)totalCount, paginationRequest.PageNumber, paginationRequest.PageSize);
 		}
-		// GET SPECIFIC LISTING
+		#endregion
+
+		#region GET SPECIFIC LISTING
 		public async Task<Listing?> GetListingByIdAsync(string listingId)
 		{
 			return await _context.Listings.Find(x => x.Id == listingId).FirstOrDefaultAsync();
 		}
-
-		// GET COUNT
+		#endregion
+		
+		#region GET COUNT
 		public async Task<IEnumerable<PropertyTypeCount>> GetCountByPropertyTypeAsync()
 		{
 			var pipeline = new BsonDocument[]
@@ -77,27 +80,36 @@ namespace Interasian.API.Repositories
 			var result = await _context.Listings.Aggregate<PropertyTypeCount>(pipeline).ToListAsync();
 			return result;
 		}
-		// CREATE LISTING
+		#endregion
+		
+		#region CREATE LISTING
 		public async Task<Listing> CreateListingAsync(Listing listing)
 		{
 			await _context.Listings.InsertOneAsync(listing);
 			return listing;
 		}
-		// UPDATE LISTING
+		#endregion
+		
+		#region UPDATE LISTING
 		public async Task UpdateListingAsync(Listing listing)
 		{
 			await _context.Listings.ReplaceOneAsync(x => x.Id == listing.Id, listing);
 		}
-		// DELETE LISTING
+		#endregion
+
+		#region DELETE LISTING
 		public async Task DeleteListingAsync(Listing listing)
 		{
 			await _context.Listings.DeleteOneAsync(x => x.Id == listing.Id);
 		}
-
+		#endregion
+		
+		#region CHECK IF LISTING EXISTS
 		public async Task<bool> ListingExistsAsync(string id) =>
 			await _context.Listings.CountDocumentsAsync(x => x.Id == id) > 0;
+		#endregion
 
-		// SORT LISTINGS
+		#region SORT LISTINGS
 		private IFindFluent<Listing, Listing> ApplySorting(IFindFluent<Listing, Listing> query, SortOptions sortOption)
         {
             return sortOption switch
@@ -111,5 +123,6 @@ namespace Interasian.API.Repositories
                 _ => query.Sort(Builders<Listing>.Sort.Ascending(x => x.Id))
             };
         }
+		#endregion
 	}
 }
