@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Interasian.API.Models;
 using Interasian.API.Utilities;
+using AspNetCoreRateLimit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,33 @@ Log.Logger = new LoggerConfiguration()
 // Use the Serilog.AspNetCore NuGet Package
 builder.Host.UseSerilog();
 
+// Caching
+builder.Services.AddMemoryCache();
+
+// Rate Limiting
+builder.Services.AddInMemoryRateLimiting();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+builder.Services.Configure<IpRateLimitOptions>(options =>
+{
+    options.GeneralRules =
+    [
+        new RateLimitRule
+        {
+            Endpoint = "*",
+            Period = "1m",
+            Limit = 100
+        }
+    ];
+
+    options.QuotaExceededResponse = new QuotaExceededResponse
+    {
+        Content = "Too many requests. Please try agian later",
+        ContentType = "application/json",
+        StatusCode = StatusCodes.Status429TooManyRequests
+    };
+});
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -64,6 +92,8 @@ app.UseSerilogRequestLogging();
 app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 app.UseHttpsRedirection();
+
+app.UseIpRateLimiting();
 
 app.UseAuthentication();
 
